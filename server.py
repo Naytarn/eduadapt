@@ -40,7 +40,6 @@ def registration():
         user.phone_number = data['phone_number']
         user.native_lang = data['native_lang']
         user.lang_lvl = data['lang_lvl']
-        user.profile_id = curr_id
         db_sess.add(user)
         db_sess.commit()
         db_sess.close()
