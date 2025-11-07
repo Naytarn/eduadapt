@@ -124,12 +124,13 @@ def editData(id: int):
         return jsonify(answer)
 
 
-def deepseekApi(prompt: str) -> requests:
+def deepseekApi(user_prompt: str, system_prompt="You are helpful assistant") -> requests:
     """
     function to get a response from deepseek
 
     Args:
-        prompt (str): prompt content
+        user_prompt (str): user prompt content
+        system_prompt (str): settings for deepseek
 
     Returns:
         requests: response from AI 
@@ -142,8 +143,8 @@ def deepseekApi(prompt: str) -> requests:
     data = {
         "model": "deepseek-chat",  
         "messages": [
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": "угадай сколько мне лет"}
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
         ],
         "temperature": 0.7,
         "max_tokens": 2048
