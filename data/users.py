@@ -14,6 +14,3 @@ class User(SqlAlchemyBase):
     phone_number = Column(String(length=11), nullable=False)
     lang_lvl = Column(String(length=2), nullable=False)
     native_lang = Column(String(length=100), nullable=False)
-    profile_id = Column(Integer, ForeignKey("profile.id"), nullable=False)
-    
-    profile_data = relationship("Profile", backref="users")

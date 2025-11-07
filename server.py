@@ -1,12 +1,16 @@
+import requests
+
 from flask import Flask, request, jsonify
 
 from data import db_session
-from data.profiles import Profile
 from data.users import User
 
 db_session.global_init("db/main.db")
 
 app = Flask(__name__)
+
+API_KEY = "sk-ca488baceb8843069f6c782043f1d54f"
+API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 
 @app.route("/api")
@@ -16,6 +20,12 @@ def api():
 
 @app.route("/api/regisration", methods=["POST"])
 def registration():
+    """
+    registration function
+
+    Returns:
+        json: answer from server
+    """
     if request.method == "POST":
         data = request.json()
         db_sess = db_session.create_session()
@@ -23,8 +33,6 @@ def registration():
         curr_id = db_sess.query(User).all()[-1].id + 1
         if other:
             return jsonify({"status": 500, "reason": "Use other login"})
-        profile = Profile()
-        db_sess.add(profile)
 
         user = User()
         user.name = data['name']
@@ -45,6 +53,12 @@ def registration():
 
 @app.route("/api/login", methods=['GET'])
 def login():
+    """
+    login function
+
+    Returns:
+        json: answer from server
+    """
     if request.method == 'GET':
         data = request.json()
         db_sess = db_session.create_session()
@@ -79,7 +93,16 @@ def login():
 
 
 @app.route("/api/editdata/<id>", methods=["PATCH"])
-def editData(id):
+def editData(id: int):
+    """
+    function for edit database
+
+    Args:
+        id (int): user id
+
+    Returns:
+        json: answer
+    """
     if request.method == "PATCH":
         db_sess = db_session.create_session()
         data = request.json()
@@ -101,4 +124,40 @@ def editData(id):
         return jsonify(answer)
 
 
-app.run(debug=True)
+def deepseekApi(prompt: str) -> requests:
+    """
+    function to get a response from deepseek
+
+    Args:
+        prompt (str): prompt content
+
+    Returns:
+        requests: response from AI 
+    """
+    global API_KEY
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {API_KEY}"
+    }
+    data = {
+        "model": "deepseek-chat",  
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant"},
+            {"role": "user", "content": "угадай сколько мне лет"}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 2048
+    }
+    response = requests.post(API_URL, json=data, headers=headers)
+
+    if response.status_code == 200:
+        result = response.json()
+        return {"status": 200, "data": result['choices'][0]['message']['content']}
+    else:
+        return {"status": response.status_code, "reason": response.text}
+
+
+# app.run(debug=True)
+
+if __name__ == "__main__":
+    print(deepseekApi())
