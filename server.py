@@ -57,7 +57,7 @@ def registration():
                                  "native_language": user.native_lang, 
                                  "phone_number": user.phone_number, 
                                  "russian_level": user.russian_level, 
-                                 "registration_date": datetime().date()}
+                                 "registration_date": datetime.now()}
                         })
 
     else:
