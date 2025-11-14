@@ -32,7 +32,6 @@ def registration():
         db_sess = db_session.create_session()
         other = db_sess.query(User).filter(
             User.username == data['username']).first()
-        curr_id = db_sess.query(User).all()[-1].id + 1
         if other:
             return jsonify({"status": 500, "error": "Use other login", "success": False})
 
@@ -44,6 +43,10 @@ def registration():
         user.russian_level = data['russian_level']
         db_sess.add(user)
         db_sess.commit()
+        
+        user = db_sess.query(User).filter(
+            User.username == data['username']
+        ).first()
         db_sess.close()
 
         return jsonify({"status": 200, 
@@ -136,7 +139,7 @@ def editData(id: int):
         db_sess = db_session.create_session()
         data = request.json()
         user = db_sess.query(User).filter(User.id == id).first(
-        ) if id else db_sess.query(User).filter(User.name == data['name'])
+        ) if id else db_sess.query(User).filter(User.username == data['name'])
 
         logs = []
         for value in data:
