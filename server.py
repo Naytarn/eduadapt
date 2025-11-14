@@ -41,6 +41,7 @@ def registration():
         user.phone_number = data['phone_number']
         user.native_lang = data['native_lang']
         user.russian_level = data['russian_level']
+        user.registration_date = datetime.now()
         db_sess.add(user)
         db_sess.commit()
         
