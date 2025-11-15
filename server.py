@@ -191,4 +191,5 @@ def deepseekApi(user_prompt: str, system_prompt="You are helpful assistant") -> 
         return {"status": response.status_code, "reason": response.text}
 
 
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
