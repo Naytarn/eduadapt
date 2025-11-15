@@ -75,48 +75,47 @@ def login():
     """
     if request.method == 'POST':
         data = request.get_json()
+        print(data)
         db_sess = db_session.create_session()
-        if "username" in data:
-            user = db_sess.query(User).filter(
-                User.username == data['username']).first()
+        if 'login' in data:
+            user = db_sess.query(User).filter(User.username == data['login']).first()
             if not user:
-                answer = {"status": 500, "error": "Wrong username", "success": False}
-            else:
-                if data['password'] == user.password:
+                users = db_sess.query(User).filter(User.phone_number == data['login']).all()
+            if user:
+                if user.password == data['password']:
                     answer = {"status": 200, 
-                              "data": {"id": user.id, 
-                                 "username": user.username, 
-                                 "native_language": user.native_lang, 
-                                 "phone_number": user.phone_number, 
-                                 "russian_level": user.russian_level, 
-                                 },
-                              "success": True,
-                              "error": None
-                              }
+                                "data": {"id": user.id, 
+                                    "username": user.username, 
+                                    "native_language": user.native_lang, 
+                                    "phone_number": user.phone_number, 
+                                    "russian_level": user.russian_level,
+                                    "registration_date": user.registration_date 
+                                    },
+                                "success": True,
+                                "error": None
+                                }
                 else:
                     answer = {"status": 500, 'error': "wrong password", "success": False}
-        elif 'phone_number' in data:
-            user = db_sess.query(User).filter(
-                User.phone_number == data['phone_number']).first()
-            if not user:
-                answer = {"status": 500, "error": "Wrong phone number", "success": False}
+            elif users:
+                for user in users:
+                    if user.password == data['password']:
+                        answer = {"status": 200, 
+                                    "data": {"id": user.id, 
+                                        "username": user.username, 
+                                        "native_language": user.native_lang, 
+                                        "phone_number": user.phone_number, 
+                                        "russian_level": user.russian_level,
+                                        "registration_date": user.registration_date 
+                                        },
+                                    "success": True,
+                                    "error": None
+                                    }
+                        break
             else:
-                if data['password'] == user.password:
-                    answer = {"status": 200, 
-                              "data": {"id": user.id, 
-                                 "username": user.username, 
-                                 "native_language": user.native_lang, 
-                                 "phone_number": user.phone_number, 
-                                 "russian_level": user.russian_level, 
-                                 },
-                              "success": True,
-                              "error": None
-                              }
-                else:
-                    answer = {"status": 500, 'error': "wrong password", "success": False}
+                answer = {"status": 500, "error": "Wrong login", "success": False}
         else:
             answer = {"status": 500,
-                      "error": "Give the phone number or username in data",
+                      "error": "Give the login param in data",
                       "success": False}
     else:
         answer = {"status": 500, 'error': 'Use POST method', "success": False}
@@ -125,7 +124,7 @@ def login():
     return jsonify(answer)
 
 
-@app.route("/api/editdata/<id>", methods=["PATCH"])
+@app.route("/api/editdata/<id>", methods=["PATCH"]) 
 def editData(id: int):
     """
     function for edit database
