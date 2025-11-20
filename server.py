@@ -1,5 +1,5 @@
 import requests
-
+from flasgger import Swagger
 from flask import Flask, request, jsonify
 from datetime import datetime
 
@@ -9,23 +9,98 @@ from data.users import User
 db_session.global_init("db/main.db")
 
 app = Flask(__name__)
-
+swagger=Swagger(app)
 API_KEY = "sk-ca488baceb8843069f6c782043f1d54f"
 API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 
-@app.route("/api")
-def api():
+@app.route("/api") 
+def api(): 
+    """ 
+    Health check endpoint 
+    --- 
+    tags: 
+      - Health 
+    responses: 
+      200: 
+        description: API is running 
+        schema: 
+          type: object 
+          properties: 
+            status: 
+              type: integer 
+              example: 200 
+            data: 
+              type: string 
+              example: "You are in api" 
+    """ 
     return jsonify({"status": 200, "data": "You are in api"})
-
 
 @app.route("/api/auth/registration", methods=["POST"])
 def registration():
     """
-    registration function
-
-    Returns:
-        json: answer from server
+    User registration endpoint 
+    --- 
+    tags: 
+      - Authentication 
+    parameters: 
+      - in: body 
+        name: body 
+        required: true 
+        schema: 
+          type: object 
+          required: 
+            - username 
+            - password 
+            - phone_number 
+            - native_lang 
+            - russian_level 
+          properties: 
+            username: 
+              type: string 
+              example: "john_doe" 
+            password: 
+              type: string 
+              example: "SecurePass123!" 
+            phone_number: 
+              type: string 
+              example: "+79161234567" 
+            native_lang: 
+              type: string 
+              example: "en" 
+            russian_level: 
+              type: string 
+              example: "B1" 
+    responses: 
+      200: 
+        description: User registered successfully 
+        schema: 
+          type: object 
+          properties: 
+            status: 
+              type: integer 
+              example: 200 
+            success: 
+              type: boolean 
+              example: true 
+            error: 
+              type: string 
+              nullable: true 
+            data: 
+              type: object 
+      500: 
+        description: Registration failed 
+        schema: 
+          type: object 
+          properties: 
+            status: 
+              type: integer 
+              example: 500 
+            error: 
+              type: string 
+            success: 
+              type: boolean 
+              example: false
     """
     if request.method == "POST":
         data = request.get_json()
@@ -68,10 +143,70 @@ def registration():
 @app.route("/api/auth/login", methods=['POST'])
 def login():
     """
-    login function
-
-    Returns:
-        json: answer from server
+   User login endpoint 
+    --- 
+    tags: 
+      - Authentication 
+    parameters: 
+      - in: body 
+        name: body 
+        required: true 
+        schema: 
+          type: object 
+          required: 
+            - login 
+            - password 
+          properties: 
+            login: 
+              type: string 
+              description: Username or phone number 
+              example: "john_doe" 
+            password: 
+              type: string 
+              example: "SecurePass123!" 
+    responses: 
+      200: 
+        description: Login successful 
+        schema: 
+          type: object 
+          properties: 
+            status: 
+              type: integer 
+              example: 200 
+            success: 
+              type: boolean 
+              example: true 
+            error: 
+              type: string 
+              nullable: true 
+            data: 
+              type: object 
+              properties: 
+                id: 
+                  type: integer 
+                username: 
+                  type: string 
+                native_language: 
+                  type: string 
+                phone_number: 
+                  type: string 
+                russian_level: 
+                  type: string 
+                registration_date: 
+                  type: string 
+      500: 
+        description: Login failed 
+        schema: 
+          type: object 
+          properties: 
+            status: 
+              type: integer 
+              example: 500 
+            error: 
+              type: string 
+            success: 
+              type: boolean 
+              example: false
     """
     if request.method == 'POST':
         data = request.get_json()
@@ -127,13 +262,59 @@ def login():
 @app.route("/api/editdata/<id>", methods=["PATCH"]) 
 def editData(id: int):
     """
-    function for edit database
-
-    Args:
-        id (int): user id
-
-    Returns:
-        json: answer
+    Edit user data endpoint 
+    --- 
+    tags: 
+      - User Management 
+    parameters: 
+      - in: path 
+        name: id 
+        type: integer 
+        required: true 
+        description: User ID 
+        example: 1 
+      - in: body 
+        name: body 
+        required: true 
+        schema: 
+          type: object 
+          properties: 
+            username: 
+              type: string 
+            password: 
+              type: string 
+            phone_number: 
+              type: string 
+            native_lang: 
+              type: string 
+            russian_level: 
+              type: string 
+    responses: 
+      200: 
+        description: Data updated successfully 
+        schema: 
+          type: object 
+          properties: 
+            status: 
+              type: integer 
+              example: 200 
+            data: 
+              type: object 
+              properties: 
+                changed_data: 
+                  type: array 
+                  items: 
+                    type: string 
+      500: 
+        description: Update failed 
+        schema: 
+          type: object 
+          properties: 
+            status: 
+              type: integer 
+              example: 500 
+            data: 
+              type: object
     """
     if request.method == "PATCH":
         db_sess = db_session.create_session()
