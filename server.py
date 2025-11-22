@@ -15,9 +15,6 @@ import base64
 from io import BytesIO
 from typing import Dict, Any
 import re
-from collections import Counter
-import numpy as np
-from PIL import Image
 
 db_session.global_init("db/main.db")
 
@@ -542,10 +539,6 @@ class WordCloudGenerator:
 
 def generate_word_cloud_api(text: str, width: int = 800, height: int = 400,
                             mask_path: str = None) -> Dict[str, Any]:
-    """
-    Основная функция для API
-    Соответствует структуре из спецификации
-    """
     try:
         # Инициализация генератора
         generator = WordCloudGenerator(width=width, height=height)
