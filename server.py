@@ -578,7 +578,7 @@ def generate_word_cloud_api(text: str, width: int = 800, height: int = 400) -> D
         generator = WordCloudGenerator(width=width, height=height)
 
         # Генерация облака слов
-        wordcloud = generator.generate_wordcloud(text, mask_path)
+        wordcloud = generator.generate_wordcloud(text)
 
         # Конвертация в base64
         image_base64 = generator.wordcloud_to_base64(wordcloud)
@@ -622,10 +622,9 @@ def word_cloud_endpoint():
         text = data['text']
         width = data.get('width', 800)
         height = data.get('height', 400)
-        mask_path = data.get('mask_path')
 
         # Генерация облака слов
-        result = generate_word_cloud_api(text, width, height, mask_path)
+        result = generate_word_cloud_api(text, width, height)
 
         return jsonify(result)
 
