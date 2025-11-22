@@ -527,7 +527,7 @@ class WordCloudGenerator:
 
         return ' '.join(filtered_words)
 
-    def generate_wordcloud(self, text: str, mask_path: str = None) -> WordCloud:
+    def generate_wordcloud(self, text: str) -> WordCloud:
         """Генерация облака слов"""
         # Предобработка текста
         processed_text = self.preprocess_text(text)
@@ -572,8 +572,7 @@ class WordCloudGenerator:
         return f"data:image/{format};base64,{image_base64}"
 
 
-def generate_word_cloud_api(text: str, width: int = 800, height: int = 400,
-                            mask_path: str = None) -> Dict[str, Any]:
+def generate_word_cloud_api(text: str, width: int = 800, height: int = 400) -> Dict[str, Any]:
     try:
         # Инициализация генератора
         generator = WordCloudGenerator(width=width, height=height)
